@@ -2,113 +2,75 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"log"
 
-	game "github.com/dilshodforever/4-oyimtixon-game-service/genprotos/product"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	pb "github.com/dilshodforever/fooddalivary-food/genprotos"
+	s "github.com/dilshodforever/fooddalivary-food/storage"
 )
 
-type GameStorage struct {
-	db *mongo.Database
+type GameService struct {
+	stg s.InitRoot
+	pb.UnimplementedOrderServiceServer
 }
 
-func NewProductStorage(db *mongo.Database) *GameStorage {
-	return &GameStorage{db: db}
+func NewGameService(stg s.InitRoot) *GameService {
+	return &GameService{stg: stg}
 }
 
-// CreateProduct inserts a new product into the database
-func (g *GameStorage) CreateProduct(ctx context.Context, req *game.Product) (*game.Product, error) {
-	coll := g.db.Collection("products")
-	_, err := coll.InsertOne(ctx, bson.M{
-		"id":          req.Id,
-		"name":        req.Name,
-		"description": req.Description,
-		"price":       req.Price,
-		"image_url":   req.ImageUrl,
-		"created_at":  req.CreatedAt.AsTime(),
-		"updated_at":  req.UpdatedAt.AsTime(),
-	})
+func (s *GameService) GetLevels(ctx context.Context, req *pb.GetLevelsRequest) (*pb.GetLevelsResponse, error) {
+	resp, err := s.stg.Game().GetLevels(req)
 	if err != nil {
-		log.Printf("Failed to create product: %v", err)
-		return nil, err
+		log.Print(err)
 	}
-
-	return req, nil
+	return resp, err
 }
 
-// GetProduct retrieves a product by its ID
-func (g *GameStorage) GetProduct(ctx context.Context, req *game.ProductIdRequest) (*game.Product, error) {
-	coll := g.db.Collection("products")
-	var product game.Product
-	err := coll.FindOne(ctx, bson.M{"id": req.Id}).Decode(&product)
+func (s *GameService) StartLevel(ctx context.Context, req *pb.StartLevelRequest) (*pb.StartLevelResponse, error) {
+	resp, err := s.stg.Game().StartLevel(req)
+	fmt.Println(11111111111)
 	if err != nil {
-		log.Printf("Failed to get product: %v", err)
-		return nil, err
+		log.Print(err)
 	}
-
-	return &product, nil
+	return resp, err
 }
 
-// UpdateProduct updates an existing product
-func (g *GameStorage) UpdateProduct(ctx context.Context, req *game.Product) (*game.Product, error) {
-	coll := g.db.Collection("products")
-	_, err := coll.UpdateOne(ctx, bson.M{"id": req.Id}, bson.M{
-		"$set": bson.M{
-			"name":        req.Name,
-			"description": req.Description,
-			"price":       req.Price,
-			"image_url":   req.ImageUrl,
-			"updated_at":  req.UpdatedAt.AsTime(),
-		},
-	})
+func (s *GameService) CompleteLevel(ctx context.Context, req *pb.CompleteLevelRequest) (*pb.CompleteLevelResponse, error) {
+	resp, err := s.stg.Game().CompleteLevel(req)
 	if err != nil {
-		log.Printf("Failed to update product: %v", err)
-		return nil, err
+		log.Print(err)
 	}
-
-	return req, nil
+	return resp, err
 }
 
-// DeleteProduct removes a product by its ID
-func (g *GameStorage) DeleteProduct(ctx context.Context, req *game.ProductIdRequest) (*game.Empty, error) {
-	coll := g.db.Collection("products")
-	_, err := coll.DeleteOne(ctx, bson.M{"id": req.Id})
+func (s *GameService) GetChallenge(ctx context.Context, req *pb.GetChallengeRequest) (*pb.Level, error) {
+	resp, err := s.stg.Game().GetChallenge(req)
 	if err != nil {
-		log.Printf("Failed to delete product: %v", err)
-		return nil, err
+		log.Print(err)
 	}
-
-	return &game.Empty{}, nil
+	return resp, err
 }
 
-// ListProducts lists all products with pagination
-func (g *GameStorage) ListProducts(ctx context.Context, req *game.ListRequest) (*game.ProductListResponse, error) {
-	coll := g.db.Collection("products")
-	cursor, err := coll.Find(ctx, bson.M{}, &mongo.FindOptions{
-		Limit: int64(req.Limit),
-		Skip:  int64(req.Offset),
-	})
+func (s *GameService) SubmitChallenge(ctx context.Context, req *pb.SubmitChallengeRequest) (*pb.SubmitChallengeResponse, error) {
+	resp, err := s.stg.Game().SubmitChallenge(req)
 	if err != nil {
-		log.Printf("Failed to list products: %v", err)
-		return nil, err
+		log.Print(err)
 	}
-	defer cursor.Close(ctx)
+	return resp, err
+}
 
-	var products []*game.Product
-	for cursor.Next(ctx) {
-		var product game.Product
-		if err := cursor.Decode(&product); err != nil {
-			log.Printf("Failed to decode product: %v", err)
-			return nil, err
-		}
-		products = append(products, &product)
+func (s *GameService) GetLeaderboard(ctx context.Context, req *pb.GetLeaderboardRequest) (*pb.LeaderboardResponse, error) {
+	resp, err := s.stg.Game().GetLeaderboard(req)
+	if err != nil {
+		log.Print(err)
 	}
+	return resp, err
+}
 
-	if err := cursor.Err(); err != nil {
-		log.Printf("Cursor error: %v", err)
-		return nil, err
+func (s *GameService) GetAchievements(ctx context.Context, req *pb.GetAchievementsRequest) (*pb.AchievementsResponse, error) {
+	resp, err := s.stg.Game().GetAchievements(req)
+	if err != nil {
+		log.Print(err)
 	}
-
-	return &game.ProductListResponse{Products: products}, nil
+	return resp, err
 }

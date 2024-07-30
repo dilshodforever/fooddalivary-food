@@ -3,38 +3,41 @@ package postgres
 import (
 	"context"
 	"log"
+	"time"
 
-	"github.com/dilshodforever/4-oyimtixon-game-service/genprotos/game"
+	pb "github.com/dilshodforever/fooddalivary-food/genprotos"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// OrderService implementation
-
-func (g *GameStorage) CreateOrder(ctx context.Context, req *game.Order) (*game.Order, error) {
+func (g *FoodStorage) CreateOrder(req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	coll := g.db.Collection("orders")
-	_, err := coll.InsertOne(ctx, bson.M{
-		"id":               req.Id,
-		"user_id":          req.UserId,
-		"courier_id":       req.CourierId,
-		"status":           req.Status,
-		"total_amount":     req.TotalAmount,
-		"delivery_address": req.DeliveryAddress,
-		"created_at":       req.CreatedAt.AsTime(),
-		"updated_at":       req.UpdatedAt.AsTime(),
-	})
+	id := uuid.NewString()
+	order := bson.M{
+		"order_id":        id,
+		"UserId":          req.UserId,
+		"CourierId":       req.CourierId,
+		"status":          req.Status,
+		"TotalAmount":     req.TotalAmount,
+		"DeliveryAddress": req.DeliveryAddress,
+		"time":            req.Time,
+		"created_at":      time.Now(),
+		"deleted_at":      0,
+		"updated_at":      time.Now(),
+	}
+
+	_, err := coll.InsertOne(context.Background(), order)
 	if err != nil {
 		log.Printf("Failed to create order: %v", err)
 		return nil, err
 	}
-
-	return req, nil
+	return &pb.CreateOrderResponse{OrderId: id, Message: "Order created successfully"}, nil
 }
 
-func (g *GameStorage) GetOrder(ctx context.Context, req *game.OrderIdRequest) (*game.Order, error) {
+func (g *FoodStorage) GetOrderById(req *pb.GetByIdRequest) (*pb.GetAllOrders, error) {
 	coll := g.db.Collection("orders")
-	var order game.Order
-	err := coll.FindOne(ctx, bson.M{"id": req.Id}).Decode(&order)
+	var order pb.GetAllOrders
+	err := coll.FindOne(context.Background(), bson.M{"order_id": req.OrderId}).Decode(&order)
 	if err != nil {
 		log.Printf("Failed to get order: %v", err)
 		return nil, err
@@ -43,57 +46,68 @@ func (g *GameStorage) GetOrder(ctx context.Context, req *game.OrderIdRequest) (*
 	return &order, nil
 }
 
-func (g *GameStorage) UpdateOrder(ctx context.Context, req *game.Order) (*game.Order, error) {
+func (g *FoodStorage) UpdateOrder(req *pb.UpdateOrderRequest) (*pb.UpdateStatusResponse, error) {
 	coll := g.db.Collection("orders")
-	_, err := coll.UpdateOne(ctx, bson.M{"id": req.Id}, bson.M{
+	_, err := coll.UpdateOne(context.Background(), bson.M{"order_id": req.OrderId}, bson.M{
 		"$set": bson.M{
-			"user_id":          req.UserId,
-			"courier_id":       req.CourierId,
-			"status":           req.Status,
-			"total_amount":     req.TotalAmount,
-			"delivery_address": req.DeliveryAddress,
-			"updated_at":       req.UpdatedAt.AsTime(),
+			"DeliveryAddress": req.DeliveryAddress,
 		},
 	})
 	if err != nil {
 		log.Printf("Failed to update order: %v", err)
-		return nil, err
+		return &pb.UpdateStatusResponse{Message: "Error while update order", Succes: false}, err
 	}
-
-	return req, nil
+	return &pb.UpdateStatusResponse{Message: "Order updated successfully", Succes: true}, nil
 }
 
-func (g *GameStorage) DeleteOrder(ctx context.Context, req *game.OrderIdRequest) (*game.Empty, error) {
+func (g *FoodStorage) DeleteOrder(req *pb.DeleteOrdersByidRequest) (*pb.DeleteOrdersByidResponse, error) {
 	coll := g.db.Collection("orders")
-	_, err := coll.DeleteOne(ctx, bson.M{"id": req.Id})
+	_, err := coll.DeleteOne(context.Background(), bson.M{"order_id": req.OrderId})
 	if err != nil {
 		log.Printf("Failed to delete order: %v", err)
-		return nil, err
+		return &pb.DeleteOrdersByidResponse{Message: "Error while delete order", Succes: false}, err
 	}
-
-	return &game.Empty{}, nil
+	return &pb.DeleteOrdersByidResponse{Message: "Order deleted successfully", Succes: true}, nil
 }
 
-func (g *GameStorage) ListOrders(ctx context.Context, req *game.ListRequest) (*game.OrderListResponse, error) {
+func (g *FoodStorage) ListOrders(req *pb.GetAllRequest) (*pb.GetAllOrdersList, error) {
 	coll := g.db.Collection("orders")
-	cursor, err := coll.Find(ctx, bson.M{}, &mongo.FindOptions{
-		Limit: int64(req.Limit),
-		Skip:  int64(req.Offset),
-	})
+
+	filter := bson.M{}
+	if req.OrderId != "" {
+		filter["OrderId"] = req.OrderId
+	}
+	if req.UserId != "" {
+		filter["UserId"] = req.UserId
+	}
+	if req.CourierId != "" {
+		filter["CourierId"] = req.CourierId
+	}
+	if req.Status != "" {
+		filter["Status"] = req.Status
+	}
+	if req.TotalAmount != 0 {
+		filter["TotalAmount"] = req.TotalAmount
+	}
+	if req.DeliveryAddress != "" {
+		filter["DeliveryAddress"] = req.DeliveryAddress
+	}
+
+	cursor, err := coll.Find(context.Background(), filter)
 	if err != nil {
 		log.Printf("Failed to list orders: %v", err)
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer cursor.Close(context.Background())
 
-	var orders []*game.Order
-	for cursor.Next(ctx) {
-		var order game.Order
+	var orders pb.GetAllOrdersList
+	for cursor.Next(context.Background()) {
+		var order pb.GetAllOrders
 		if err := cursor.Decode(&order); err != nil {
 			log.Printf("Failed to decode order: %v", err)
 			return nil, err
 		}
-		orders = append(orders, &order)
+		orders.Orders = append(orders.Orders, &order)
 	}
 
 	if err := cursor.Err(); err != nil {
@@ -101,5 +115,26 @@ func (g *GameStorage) ListOrders(ctx context.Context, req *game.ListRequest) (*g
 		return nil, err
 	}
 
-	return &game.OrderListResponse{Orders: orders}, nil
+	return &orders, nil
 }
+
+
+func (g *FoodStorage) UpdateStatus(req *pb.UpdateStatusRequest) (*pb.UpdateStatusResponse, error) {
+	coll := g.db.Collection("orders")
+	_, err := coll.UpdateOne(context.Background(), bson.M{"order_id": req.OrderId}, bson.M{
+		"$set": bson.M{
+			"status": req.Status,
+		},
+	})
+	if err != nil {
+		log.Printf("Failed to update order status: %v", err)
+		return nil, err
+	}
+
+	return &pb.UpdateStatusResponse{Message: "Order status updated successfully"}, nil
+}
+
+
+
+
+

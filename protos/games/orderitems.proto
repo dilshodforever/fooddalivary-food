@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package orderitems;
+
+
+option go_package = "genprotos/";
+
+
+// service OrderItemService {
+//     rpc CreateOrderItem (OrderItem) returns (OrderItem);
+//     rpc GetOrderItem (OrderItemIdRequest) returns (OrderItem);
+//     rpc UpdateOrderItem (OrderItem) returns (OrderItem);
+//     rpc DeleteOrderItem (OrderItemIdRequest) returns (Empty);
+//     rpc ListOrderItems (ListRequest) returns (OrderItemListResponse);
+// }
+
+
+
+// message OrderItem {
+//     string id = 1;
+//     string order_id = 2;
+//     string products = 3;
+//     int32 quantity = 4;
+//     double price = 5;
+// }

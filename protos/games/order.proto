@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package order;
+
+option go_package = "genprotos/";
+
+
+service OrderService {
+    rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse);
+    rpc GetOrderByid (GetByIdRequest) returns (GetAllOrders);
+    rpc UpdateOrder (UpdateOrderRequest) returns (UpdateStatusResponse);
+    rpc DeleteOrder (DeleteOrdersByidRequest) returns (DeleteOrdersByidResponse);
+    rpc ListOrders (GetAllRequest) returns (GetAllOrders);
+    rpc UpdateStatus(UpdateOrderRequest) returns(UpdateStatusResponse);
+}
+
+message CreateOrderRequest {
+    string user_id = 1;
+    string courier_id = 2;
+    string status = 3;
+    double total_amount = 4;
+    string delivery_address = 5;
+    string time =6;
+}
+
+message CreateOrderResponse{
+    string order_id=1;
+    string message=9;
+}
+
+
+
+message GetAllOrders {
+    string order_id=1;
+    string user_id = 2;
+    string courier_id = 3;
+    string status = 4;
+    double total_amount = 5;
+    string delivery_address = 6;
+    string time =7;
+}
+
+message GetAllRequest{
+    string order_id=1;
+    string user_id = 2;
+    string courier_id = 3;
+    string status = 4;
+    double total_amount = 5;
+    string delivery_address = 6;
+}
+message GetAllOrdersList{
+    repeated GetAllOrders orders = 1;
+}
+
+message GetByIdRequest{
+    string order_id=1;
+}
+
+
+message UpdateOrderRequest {
+    string order_id =1;
+    string delivery_address = 2;
+}
+
+
+message UpdateStatusRequest{
+    string order_id=1;
+    string status=2;
+}
+
+message UpdateStatusResponse{
+    bool succes =1;
+    string message =2;
+}
+
+
+message DeleteOrdersByidRequest{
+    string order_id=1;
+}
+
+message DeleteOrdersByidResponse{
+    bool succes =1;
+    string message =2;
+}

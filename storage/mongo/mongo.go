@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	u "github.com/dilshodforever/4-oyimtixon-game-service/storage"
+	u "github.com/dilshodforever/fooddalivary-food/storage"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

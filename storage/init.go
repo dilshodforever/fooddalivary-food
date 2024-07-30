@@ -1,19 +1,19 @@
 package storage
 
 import (
-	pb "github.com/dilshodforever/4-oyimtixon-game-service/genprotos/game"
+	pb "github.com/dilshodforever/fooddalivary-food/genprotos"
 )
 
+// InitRoot provides access to the different storage interfaces.
 type InitRoot interface {
-	Game() GameStorage
+	Product() ProductStorage
 }
 
-type GameStorage interface {
-	GetLevels(req *pb.GetLevelsRequest) (*pb.GetLevelsResponse, error)
-	StartLevel(req *pb.StartLevelRequest) (*pb.StartLevelResponse, error)
-	CompleteLevel(req *pb.CompleteLevelRequest) (*pb.CompleteLevelResponse, error)
-	GetChallenge(req *pb.GetChallengeRequest) (*pb.Level, error)
-	SubmitChallenge(req *pb.SubmitChallengeRequest) (*pb.SubmitChallengeResponse, error)
-	GetLeaderboard(req *pb.GetLeaderboardRequest) (*pb.LeaderboardResponse, error)
-	GetAchievements(req *pb.GetAchievementsRequest) (*pb.AchievementsResponse, error)
+// ProductStorage defines the methods required for product-related operations.
+type ProductStorage interface {
+	CreateProduct(req *pb.CreateProductRequest) (*pb.ProductResponse, error)
+	GetProduct(req *pb.ProductIdRequest) (*pb.GetProductResponse, error)
+	UpdateProduct(req *pb.UpdateProductRequest) (*pb.ProductResponse, error)
+	DeleteProduct(req *pb.ProductIdRequest) (*pb.ProductResponse, error)
+	ListProducts(req *pb.GetAllProductRequest) (*pb.GetAllProductResponse, error)
 }
