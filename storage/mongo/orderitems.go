@@ -6,7 +6,6 @@ import (
 
 	game "github.com/dilshodforever/fooddalivary-food/genprotos"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // OrderItemService implementation
@@ -14,11 +13,11 @@ import (
 func (g *FoodStorage) CreateOrderItem(ctx context.Context, req *game.OrderItem) (*game.OrderItem, error) {
 	coll := g.db.Collection("order_items")
 	_, err := coll.InsertOne(ctx, bson.M{
-		"id":        req.Id,
-		"order_id":  req.OrderId,
+		"id":         req.Id,
+		"order_id":   req.OrderId,
 		"product_id": req.ProductId,
-		"quantity":  req.Quantity,
-		"price":     req.Price,
+		"quantity":   req.Quantity,
+		"price":      req.Price,
 	})
 	if err != nil {
 		log.Printf("Failed to create order item: %v", err)
