@@ -29,8 +29,8 @@ func (f *FoodStorage) CreateProduct(req *pb.CreateProductRequest) (*pb.ProductRe
 		"description":  req.Description,
 		"price":        req.Price,
 		"ImageUrl":     req.ImageUrl,
-		"CreatedAt":    time.Now(),
-		"UpdatedAt":    time.Now(),
+		"CreatedAt":    time.Now().String(),
+		"UpdatedAt":    time.Now().String(),
 	})
 	if err != nil {
 		log.Printf("Failed to create product: %v", err)

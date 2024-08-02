@@ -28,7 +28,8 @@ func (s *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderReque
 }
 
 // GetOrderById retrieves an order by its ID
-func (s *OrderService) GetOrderById(ctx context.Context, req *pb.GetByIdRequest) (*pb.GetAllOrders, error) {
+
+func (s *OrderService) GetOrderByid(ctx context.Context, req *pb.GetByIdRequest) (*pb.GetAllOrders, error) {
 	resp, err := s.stg.Order().GetOrderById(req)
 	if err != nil {
 		log.Print(err)
@@ -38,6 +39,7 @@ func (s *OrderService) GetOrderById(ctx context.Context, req *pb.GetByIdRequest)
 }
 
 // UpdateOrder updates an existing order
+
 func (s *OrderService) UpdateOrder(ctx context.Context, req *pb.UpdateOrderRequest) (*pb.UpdateStatusResponse, error) {
 	resp, err := s.stg.Order().UpdateOrder(req)
 	if err != nil {

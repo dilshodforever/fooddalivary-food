@@ -21,6 +21,9 @@ func main() {
 	}
 	s := grpc.NewServer()
 	pb.RegisterOrderServiceServer(s, service.NewOrderService(db))
+	pb.RegisterOrderItemServiceServer(s, service.NewOrderItemService(db))
+	pb.RegisterProductServiceServer(s, service.NewProductService(db))
+	
 	log.Printf("server listening at %v", liss.Addr())
 	if err := s.Serve(liss); err != nil {
 		log.Fatalf("failed to serve: %v", err)

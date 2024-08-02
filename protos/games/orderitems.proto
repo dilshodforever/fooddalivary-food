@@ -23,7 +23,7 @@ message AddItemsRequest{
 
 message AddItemsResponse{
     double total_price =1;
-   repeated GetProductResponse products = 2;
+    repeated GetProductResponse products = 2;
     int32 quantity = 3;
 }
 
