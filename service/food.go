@@ -19,17 +19,17 @@ func NewProductService(stg s.InitRoot) *ProductService {
 
 // CreateProduct handles the creation of a new product
 func (s *ProductService) CreateProduct(ctx context.Context, req *pb.CreateProductRequest) (*pb.ProductResponse, error) {
-	resp, err := s.stg.Product().CreateProduct(ctx, req)
+	resp, err := s.stg.Product().CreateProduct(req)
 	if err != nil {
 		log.Print(err)
-		return &pb.ProductResponse{Message: "Failed to create product", Success: false}, err
+		return resp, err
 	}
-	return &pb.ProductResponse{Message: "Product created successfully", Success: true}, nil
+	return resp, nil
 }
 
 // GetProduct retrieves a product by its ID
 func (s *ProductService) GetProduct(ctx context.Context, req *pb.ProductIdRequest) (*pb.GetProductResponse, error) {
-	resp, err := s.stg.Product().GetProduct(ctx, req)
+	resp, err := s.stg.Product().GetProduct(req)
 	if err != nil {
 		log.Print(err)
 		return nil, err
@@ -39,30 +39,31 @@ func (s *ProductService) GetProduct(ctx context.Context, req *pb.ProductIdReques
 
 // UpdateProduct updates an existing product
 func (s *ProductService) UpdateProduct(ctx context.Context, req *pb.UpdateProductRequest) (*pb.ProductResponse, error) {
-	resp, err := s.stg.Product().UpdateProduct(ctx, req)
+	resp, err := s.stg.Product().UpdateProduct(req)
 	if err != nil {
 		log.Print(err)
-		return &pb.ProductResponse{Message: "Failed to update product", Success: false}, err
+		return resp, err
 	}
-	return &pb.ProductResponse{Message: "Product updated successfully", Success: true}, nil
+	return resp, nil
 }
 
 // DeleteProduct removes a product by its ID
 func (s *ProductService) DeleteProduct(ctx context.Context, req *pb.ProductIdRequest) (*pb.ProductResponse, error) {
-	resp, err := s.stg.Product().DeleteProduct(ctx, req)
+	resp, err := s.stg.Product().DeleteProduct(req)
 	if err != nil {
 		log.Print(err)
-		return &pb.ProductResponse{Message: "Failed to delete product", Success: false}, err
+		return resp, err
 	}
-	return &pb.ProductResponse{Message: "Product deleted successfully", Success: true}, nil
+	return resp, nil
 }
 
 // ListProducts lists all products
 func (s *ProductService) ListProducts(ctx context.Context, req *pb.GetAllProductRequest) (*pb.GetAllProductResponse, error) {
-	resp, err := s.stg.Product().ListProducts(ctx, req)
+	resp, err := s.stg.Product().ListProducts(req)
 	if err != nil {
 		log.Print(err)
 		return nil, err
 	}
 	return resp, nil
 }
+

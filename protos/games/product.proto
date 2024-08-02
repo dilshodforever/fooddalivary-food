@@ -1,8 +1,6 @@
 syntax = "proto3";
 
-package product;
-
-
+package protos;
 
 option go_package = "genprotos/";
 
@@ -45,6 +43,7 @@ message UpdateProductRequest{
     string name = 2;
     string description = 3;
     double price = 4;
+    string image_url=5;
 }
 
 message ProductResponse{

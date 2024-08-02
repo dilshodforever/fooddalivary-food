@@ -12,21 +12,27 @@ import (
 
 func (g *FoodStorage) CreateOrder(req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	coll := g.db.Collection("orders")
+	allitems, err:=g.ListOrderItems(&pb.GetByUseridItems{UserId: req.UserId})
+	if err != nil {
+		log.Printf("Failed to get OrderItems: %v", err)
+		return nil, err
+	}
 	id := uuid.NewString()
 	order := bson.M{
 		"order_id":        id,
 		"UserId":          req.UserId,
 		"CourierId":       req.CourierId,
-		"status":          req.Status,
-		"TotalAmount":     req.TotalAmount,
+		"status":          "Tayyorlanmoqda",
+		"TotalAmount":     allitems.TotalPrice,
 		"DeliveryAddress": req.DeliveryAddress,
 		"time":            req.Time,
+		"products":		   allitems.Products,
 		"created_at":      time.Now(),
 		"deleted_at":      0,
 		"updated_at":      time.Now(),
 	}
 
-	_, err := coll.InsertOne(context.Background(), order)
+	_, err = coll.InsertOne(context.Background(), order)
 	if err != nil {
 		log.Printf("Failed to create order: %v", err)
 		return nil, err

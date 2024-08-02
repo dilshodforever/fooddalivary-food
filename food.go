@@ -20,7 +20,7 @@ func main() {
 		log.Fatal("Error while connection on tcp: ", err.Error())
 	}
 	s := grpc.NewServer()
-	pb.RegisterOrderServiceServer(s, service.NewProductService(db))
+	pb.RegisterOrderServiceServer(s, service.NewOrderService(db))
 	log.Printf("server listening at %v", liss.Addr())
 	if err := s.Serve(liss); err != nil {
 		log.Fatalf("failed to serve: %v", err)

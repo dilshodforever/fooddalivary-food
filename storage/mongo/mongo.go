@@ -12,7 +12,9 @@ import (
 
 type MongoStorage struct {
 	Db    *mongo.Database
-	Games u.GameStorage
+	Products u.ProductStorage
+	Orders   u.OrderStorage
+	OrderItems u.OrderItemStorage
 }
 
 func NewMongoConnecti0n() (u.InitRoot, error) {
@@ -40,9 +42,27 @@ func NewMongoConnecti0n() (u.InitRoot, error) {
 	return &MongoStorage{Db: db}, err
 }
 
-func (s *MongoStorage) Game() u.GameStorage {
-	if s.Games == nil {
-		s.Games = &GameStorage{s.Db}
+func (s *MongoStorage) Product() u.ProductStorage {
+	if s.Products == nil {
+		s.Products = &FoodStorage{s.Db}
 	}
-	return s.Games
+	return s.Products
+}
+
+
+
+func (s *MongoStorage) Order() u.OrderStorage {
+	if s.Orders == nil {
+		s.Orders = &FoodStorage{s.Db}
+	}
+	return s.Orders
+}
+
+
+
+func (s *MongoStorage) OrderItem() u.OrderItemStorage {
+	if s.OrderItems == nil {
+		s.OrderItems = &FoodStorage{s.Db}
+	}
+	return s.OrderItems
 }

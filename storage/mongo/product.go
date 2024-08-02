@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"context"
+	ctx "context"
 	"log"
 	"time"
 
@@ -20,10 +20,10 @@ func NewProductStorage(db *mongo.Database) *FoodStorage {
 }
 
 // CreateProduct inserts a new product into the database
-func (f *FoodStorage) CreateProduct(ctx context.Context, req *pb.CreateProductRequest) (*pb.ProductResponse, error) {
+func (f *FoodStorage) CreateProduct(req *pb.CreateProductRequest) (*pb.ProductResponse, error) {
 	coll := f.db.Collection("products")
 	id:=uuid.NewString()
-	_, err := coll.InsertOne(ctx, bson.M{
+	_, err := coll.InsertOne(ctx.Background(), bson.M{
 		"ProductId":	id,
 		"name":         req.Name,
 		"description":  req.Description,
@@ -47,22 +47,21 @@ func (f *FoodStorage) CreateProduct(ctx context.Context, req *pb.CreateProductRe
 }
 
 // GetProduct retrieves a product by its ID
-func (f *FoodStorage) GetProduct(ctx context.Context, req *pb.ProductIdRequest) (*pb.GetProductResponse, error) {
+func (f *FoodStorage) GetProduct(req *pb.ProductIdRequest) (*pb.GetProductResponse, error) {
 	coll := f.db.Collection("products")
 	var product pb.GetProductResponse
-	err := coll.FindOne(ctx, bson.M{"ProductId": req.ProductId}).Decode(&product)
+	err := coll.FindOne(ctx.Background(), bson.M{"ProductId": req.ProductId}).Decode(&product)
 	if err != nil {
 		log.Printf("Failed to get product: %v", err)
 		return nil, err
 	}
-
 	return &product, nil
 }
 
 // UpdateProduct updates an existing product
-func (f *FoodStorage) UpdateProduct(ctx context.Context, req *pb.UpdateProductRequest) (*pb.ProductResponse, error) {
+func (f *FoodStorage) UpdateProduct(req *pb.UpdateProductRequest) (*pb.ProductResponse, error) {
 	coll := f.db.Collection("products")
-	_, err := coll.UpdateOne(ctx, bson.M{"ProductId": req.ProductId}, bson.M{
+	_, err := coll.UpdateOne(ctx.Background(), bson.M{"ProductId": req.ProductId}, bson.M{
 		"$set": bson.M{
 			"name":        req.Name,
 			"description": req.Description,
@@ -86,9 +85,9 @@ func (f *FoodStorage) UpdateProduct(ctx context.Context, req *pb.UpdateProductRe
 }
 
 // DeleteProduct removes a product by its ID
-func (f *FoodStorage) DeleteProduct(ctx context.Context, req *pb.ProductIdRequest) (*pb.ProductResponse, error) {
+func (f *FoodStorage) DeleteProduct(req *pb.ProductIdRequest) (*pb.ProductResponse, error) {
 	coll := f.db.Collection("products")
-	_, err := coll.DeleteOne(ctx, bson.M{"ProductId": req.ProductId})
+	_, err := coll.DeleteOne(ctx.Background(), bson.M{"ProductId": req.ProductId})
 	if err != nil {
 		log.Printf("Failed to delete product: %v", err)
 		return &pb.ProductResponse{
@@ -104,7 +103,7 @@ func (f *FoodStorage) DeleteProduct(ctx context.Context, req *pb.ProductIdReques
 }
 
 // ListProducts lists all products
-func (f *FoodStorage) ListProducts(ctx context.Context, req *pb.UpdateProductRequest) (*pb.GetAllProductResponse, error) {
+func (f *FoodStorage) ListProducts(req *pb.GetAllProductRequest) (*pb.GetAllProductResponse, error) {
 	coll := f.db.Collection("products")
 
 	// Build the filter query based on the fields provided in the request
@@ -123,12 +122,12 @@ func (f *FoodStorage) ListProducts(ctx context.Context, req *pb.UpdateProductReq
 	}
 
 	// Execute the query with the filter
-	cursor, err := coll.Find(ctx, filter)
+	cursor, err := coll.Find(ctx.Background(), filter)
 	if err != nil {
 		log.Printf("Failed to list products: %v", err)
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer cursor.Close(ctx.Background())
 
 	// Check if any documents were found
 	if cursor.RemainingBatchLength() == 0 {
@@ -140,7 +139,7 @@ func (f *FoodStorage) ListProducts(ctx context.Context, req *pb.UpdateProductReq
 	}
 
 	var products []*pb.GetProductResponse
-	for cursor.Next(ctx) {
+	for cursor.Next(ctx.Background()) {
 		var product pb.GetProductResponse
 		if err := cursor.Decode(&product); err != nil {
 			log.Printf("Failed to decode product: %v", err)
