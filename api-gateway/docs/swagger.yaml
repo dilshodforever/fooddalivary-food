@@ -1,0 +1,562 @@
+basePath: /
+definitions:
+  genprotos.AddItemsRequest:
+    properties:
+      id:
+        type: string
+      product_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  genprotos.AddItemsResponse:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/genprotos.GetProductResponse'
+        type: array
+      quantity:
+        type: integer
+      total_price:
+        type: number
+    type: object
+  genprotos.CreateOrderRequest:
+    properties:
+      courier_id:
+        type: string
+      delivery_address:
+        type: string
+      time:
+        type: string
+      user_id:
+        type: string
+    type: object
+  genprotos.CreateOrderResponse:
+    properties:
+      message:
+        type: string
+      order_id:
+        type: string
+    type: object
+  genprotos.CreateProductRequest:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  genprotos.DeleItemsRequest:
+    properties:
+      product_id:
+        type: string
+    type: object
+  genprotos.DeleteOrdersByidResponse:
+    properties:
+      message:
+        type: string
+      succes:
+        type: boolean
+    type: object
+  genprotos.DeleteProductResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  genprotos.GetAllItems:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/genprotos.GetProductResponse'
+        type: array
+      quantity:
+        type: integer
+      total_price:
+        type: number
+    type: object
+  genprotos.GetAllOrders:
+    properties:
+      courier_id:
+        type: string
+      delivery_address:
+        type: string
+      order_id:
+        type: string
+      products:
+        items:
+          $ref: '#/definitions/genprotos.GetProductResponse'
+        type: array
+      status:
+        type: string
+      time:
+        type: string
+      total_amount:
+        type: number
+      user_id:
+        type: string
+    type: object
+  genprotos.GetAllOrdersList:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/genprotos.GetAllOrders'
+        type: array
+    type: object
+  genprotos.GetAllProductResponse:
+    properties:
+      allproducts:
+        items:
+          $ref: '#/definitions/genprotos.GetProductResponse'
+        type: array
+      message:
+        type: string
+    type: object
+  genprotos.GetProductResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  genprotos.ProductResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  genprotos.UpdateOrderRequest:
+    properties:
+      delivery_address:
+        type: string
+      order_id:
+        type: string
+    type: object
+  genprotos.UpdateProductRequest:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: string
+    type: object
+  genprotos.UpdateStatusRequest:
+    properties:
+      order_id:
+        type: string
+      status:
+        type: string
+    type: object
+  genprotos.UpdateStatusResponse:
+    properties:
+      message:
+        type: string
+      succes:
+        type: boolean
+    type: object
+info:
+  contact: {}
+  description: API documentation for the gateway service
+  title: API Gateway
+  version: "1.0"
+paths:
+  /orderitems:
+    delete:
+      consumes:
+      - application/json
+      description: Remove items from an existing order
+      parameters:
+      - description: Items deletion data
+        in: body
+        name: items
+        required: true
+        schema:
+          $ref: '#/definitions/genprotos.DeleItemsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Items deleted successfully
+          schema:
+            $ref: '#/definitions/genprotos.DeleteProductResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete Items
+      tags:
+      - OrderItem
+    get:
+      consumes:
+      - application/json
+      description: List all items in an order for a given user
+      parameters:
+      - description: User ID
+        in: query
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of order items
+          schema:
+            $ref: '#/definitions/genprotos.GetAllItems'
+        "400":
+          description: Missing or invalid user ID
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List Order Items
+      tags:
+      - OrderItem
+    post:
+      consumes:
+      - application/json
+      description: Add items to an existing order
+      parameters:
+      - description: Items data
+        in: body
+        name: items
+        required: true
+        schema:
+          $ref: '#/definitions/genprotos.AddItemsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Items added successfully
+          schema:
+            $ref: '#/definitions/genprotos.AddItemsResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Add Items
+      tags:
+      - OrderItem
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: List all orders with optional filtering
+      parameters:
+      - description: Order status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of orders
+          schema:
+            $ref: '#/definitions/genprotos.GetAllOrdersList'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List Orders
+      tags:
+      - Order
+    post:
+      consumes:
+      - application/json
+      description: Create a new order with the given details
+      parameters:
+      - description: Order data
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/genprotos.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order created successfully
+          schema:
+            $ref: '#/definitions/genprotos.CreateOrderResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create Order
+      tags:
+      - Order
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing order
+      parameters:
+      - description: Updated order data
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/genprotos.UpdateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order updated successfully
+          schema:
+            $ref: '#/definitions/genprotos.UpdateStatusResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update Order
+      tags:
+      - Order
+  /orders/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an order by its ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order deleted successfully
+          schema:
+            $ref: '#/definitions/genprotos.DeleteOrdersByidResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete Order
+      tags:
+      - Order
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an order's details by its ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order details
+          schema:
+            $ref: '#/definitions/genprotos.GetAllOrders'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Order By ID
+      tags:
+      - Order
+  /orders/status:
+    patch:
+      consumes:
+      - application/json
+      description: Update the status of an existing order
+      parameters:
+      - description: Status update data
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/genprotos.UpdateStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order status updated successfully
+          schema:
+            $ref: '#/definitions/genprotos.UpdateStatusResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update Order Status
+      tags:
+      - Order
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: List all available products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of products
+          schema:
+            $ref: '#/definitions/genprotos.GetAllProductResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List Products
+      tags:
+      - Product
+    post:
+      consumes:
+      - application/json
+      description: Create a new product with the given details
+      parameters:
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/genprotos.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product created successfully
+          schema:
+            $ref: '#/definitions/genprotos.ProductResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create Product
+      tags:
+      - Product
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing product
+      parameters:
+      - description: Updated product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/genprotos.UpdateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product updated successfully
+          schema:
+            $ref: '#/definitions/genprotos.ProductResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update Product
+      tags:
+      - Product
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product deleted successfully
+          schema:
+            $ref: '#/definitions/genprotos.ProductResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete Product
+      tags:
+      - Product
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a product's details by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product details
+          schema:
+            $ref: '#/definitions/genprotos.GetProductResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Product By ID
+      tags:
+      - Product
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
