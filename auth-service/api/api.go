@@ -15,8 +15,7 @@ import (
 
 // @title Auth Service
 // @version 1.0
-// @description Auth service API documentation
-// @host localhost:8081
+// @description Dilshod
 // @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in header

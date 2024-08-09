@@ -1,4 +1,3 @@
-
 CREATE TABLE users (
     id UUID PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -10,8 +9,9 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT now()
 );
 
-
 CREATE TABLE refresh_tokens (
     username VARCHAR(50),
     token VARCHAR(500) UNIQUE NOT NULL
 );
+
+

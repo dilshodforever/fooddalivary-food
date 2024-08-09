@@ -107,10 +107,9 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:8081
 info:
   contact: {}
-  description: Auth service API documentation
+  description: Dilshod
   title: Auth Service
   version: "1.0"
 paths:
